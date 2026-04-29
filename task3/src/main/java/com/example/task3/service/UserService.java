@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,41 +16,45 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+
+    /*
     @PostConstruct
-    public void demonstrateCrud() {
-        System.out.println("CRUD");
-
-        // 1. Создание (CREATE)
-        System.out.println("\n1. Создание пользователей:");
-        userRepository.save(new User("Иван", "ivan2222@mail.ru"));
-        userRepository.save(new User("Мария", "maria22222@gmail.com"));
-
-
-        System.out.println("чуваки");
-        List<User> allUsers = userRepository.findAll();
-        allUsers.forEach(System.out::println);
+    public void run(){
+        addUser(new User("Ваня", "pochta.ru"));
+        addUser(new User("степа", "gmail.com"));
+        getAllUsers().forEach(System.out::println);
+    }
+    */
 
 
-        System.out.println("\nпоиск чуваков");
-        Optional<User> userOpt = userRepository.findById(1L);
-        userOpt.ifPresent(System.out::println);
+    public User createUser(User user) {
+        user.setDateAdded(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
 
 
-        System.out.println("\nобновление чуваков с ID 1:");
-        if (userOpt.isPresent()) {
-            User userToUpdate = userOpt.get();
-            userToUpdate.setName("Иван Обновленный");
-            userToUpdate.setEmail("new.ivan@mail.ru");
-            userRepository.save(userToUpdate);
-            System.out.println("Результат " + userRepository.findById(1L).orElse(null));
-        }
+    public User updateUser(Long id, User userDetails) {
+        User user = userRepository.findById(id);
+        user.setName(userDetails.getName());
+        user.setEmail(userDetails.getEmail());
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
 
 
-        System.out.println("\n5. Удаление  с ID 2:");
-        userRepository.deleteById(2L);
-        System.out.println("Оставшиеся");
-        userRepository.findAll().forEach(System.out::println);
-
-
+    @Deprecated
+    public void addUser(User user) {
+        createUser(user);
     }
 }
